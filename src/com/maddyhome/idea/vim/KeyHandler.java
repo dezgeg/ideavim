@@ -677,6 +677,13 @@ public class KeyHandler {
       }
     }
 
+    @Override
+    public String toString() {
+      return "ActionRunner{" +
+             "cmd=" + cmd +
+             '}';
+    }
+
     private final Editor editor;
     private final DataContext context;
     private final Command cmd;

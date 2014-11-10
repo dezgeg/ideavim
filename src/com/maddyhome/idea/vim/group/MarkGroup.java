@@ -431,9 +431,9 @@ public class MarkGroup {
         jumpElem.setAttribute("column", Integer.toString(jump.getCol()));
         jumpElem.setAttribute("filename", StringUtil.notNullize(jump.getFilename()));
         jumpsElem.addContent(jumpElem);
-        if (logger.isDebugEnabled()) {
-          logger.debug("saved jump = " + jump);
-        }
+        //if (logger.isDebugEnabled()) {
+        //  logger.debug("saved jump = " + jump);
+        //}
       }
     }
     element.addContent(jumpsElem);
@@ -540,12 +540,12 @@ public class MarkGroup {
       for (Character ch : marks.keySet()) {
         Mark mark = marks.get(ch);
 
-        if (logger.isDebugEnabled()) logger.debug("mark = " + mark);
+        //if (logger.isDebugEnabled()) logger.debug("mark = " + mark);
         // If the end of the deleted text is prior to the marked line, simply shift the mark up by the
         // proper number of lines.
         if (delEnd.line < mark.getLogicalLine()) {
           int lines = delEnd.line - delStart.line;
-          if (logger.isDebugEnabled()) logger.debug("Shifting mark by " + lines + " lines");
+          //if (logger.isDebugEnabled()) logger.debug("Shifting mark by " + lines + " lines");
           mark.setLogicalLine(mark.getLogicalLine() - lines);
         }
         // If the deleted text begins before the mark and ends after the mark then it may be shifted or deleted
@@ -634,7 +634,7 @@ public class MarkGroup {
     public void beforeDocumentChange(@NotNull DocumentEvent event) {
       if (!VimPlugin.isEnabled()) return;
 
-      if (logger.isDebugEnabled()) logger.debug("MarkUpdater before, event = " + event);
+      //if (logger.isDebugEnabled()) logger.debug("MarkUpdater before, event = " + event);
       if (event.getOldLength() == 0) return;
 
       Document doc = event.getDocument();
@@ -652,7 +652,7 @@ public class MarkGroup {
     public void documentChanged(@NotNull DocumentEvent event) {
       if (!VimPlugin.isEnabled()) return;
 
-      if (logger.isDebugEnabled()) logger.debug("MarkUpdater after, event = " + event);
+      //if (logger.isDebugEnabled()) logger.debug("MarkUpdater after, event = " + event);
       if (event.getNewLength() == 0 || (event.getNewLength() == 1 && !event.getNewFragment().equals("\n"))) return;
 
       Document doc = event.getDocument();

@@ -112,7 +112,7 @@ public class RegisterGroup {
    */
   public void resetRegister() {
     lastRegister = defaultRegister;
-    logger.debug("register reset");
+    //logger.debug("register reset");
   }
 
   /**
