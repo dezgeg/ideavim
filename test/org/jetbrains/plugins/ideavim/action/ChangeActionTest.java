@@ -148,6 +148,149 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("cw"), "<caret>$value\n", "value\n");
   }
 
+
+
+
+
+
+
+  public void testChangeWordAtEndOfWord() {
+    doTest(parseKeys("cw"), "foo <caret>x bar\n", "foo  bar\n");
+  }
+
+  public void testChangeBigWordAtEndOfWord() {
+    doTest(parseKeys("cW"), "foo <caret>x bar\n", "foo  bar\n");
+  }
+
+  public void testChangeEndAtEndOfWord() {
+    doTest(parseKeys("ce"), "foo <caret>x bar\n", "foo \n");
+  }
+
+  public void testChangeBigEndAtEndOfWord() {
+    doTest(parseKeys("cE"), "foo <caret>x bar\n", "foo \n");
+  }
+
+  public void testDeleteWordAtEndOfWord() {
+    doTest(parseKeys("dw"), "foo <caret>x bar\n", "foo bar\n");
+  }
+
+  public void testDeleteBigWordAtEndOfWord() {
+    doTest(parseKeys("dW"), "foo <caret>x bar\n", "foo bar\n");
+  }
+
+  public void testDeleteEndAtEndOfWord() {
+    doTest(parseKeys("de"), "foo <caret>x bar\n", "foo \n");
+  }
+
+  public void testDeleteBigEndAtEndOfWord() {
+    doTest(parseKeys("dE"), "foo <caret>x bar\n", "foo \n");
+  }
+
+  public void testChangeWordAtStartOfWord() {
+    doTest(parseKeys("cw"), "foo <caret>xy bar\n", "foo  bar\n");
+  }
+
+  public void testChangeBigWordAtStartOfWord() {
+    doTest(parseKeys("cW"), "foo <caret>xy bar\n", "foo  bar\n");
+  }
+
+  public void testChangeEndAtStartOfWord() {
+    doTest(parseKeys("ce"), "foo <caret>xy bar\n", "foo  bar\n");
+  }
+
+  public void testChangeBigEndAtStartOfWord() {
+    doTest(parseKeys("cE"), "foo <caret>xy bar\n", "foo  bar\n");
+  }
+
+
+  public void testDeleteWordAtStartOfWord() {
+    doTest(parseKeys("dw"), "foo <caret>xy bar\n", "foo bar\n");
+  }
+
+  public void testDeleteBigWordAtStartOfWord() {
+    doTest(parseKeys("dW"), "foo <caret>xy bar\n", "foo bar\n");
+  }
+
+  public void testDeleteEndAtStartOfWord() {
+    doTest(parseKeys("de"), "foo <caret>xy bar\n", "foo  bar\n");
+  }
+
+  public void testDeleteBigEndAtStartOfWord() {
+    doTest(parseKeys("dE"), "foo <caret>xy bar\n", "foo  bar\n");
+  }
+
+
+
+
+  public void testChangeWordAtStartOfMixedWord() {
+    doTest(parseKeys("cw"), "foo <caret>x$ bar\n", "foo $ bar\n");
+  }
+
+  public void testChangeBigWordAtStartOfMixedWord() {
+    doTest(parseKeys("cW"), "foo <caret>x$ bar\n", "foo  bar\n");
+  }
+
+  public void testChangeEndAtStartOfMixedWord() {
+    doTest(parseKeys("ce"), "foo <caret>x$ bar\n", "foo  bar\n");
+  }
+
+  public void testChangeBigEndAtStartOfMixedWord() {
+    doTest(parseKeys("cE"), "foo <caret>x$ bar\n", "foo  bar\n");
+  }
+
+
+  public void testDeleteWordAtStartOfMixedWord() {
+    doTest(parseKeys("dw"), "foo <caret>x$ bar\n", "foo $ bar\n");
+  }
+
+  public void testDeleteBigWordAtStartOfMixedWord() {
+    doTest(parseKeys("dW"), "foo <caret>x$ bar\n", "foo bar\n");
+  }
+
+  public void testDeleteEndAtStartOfMixedWord() {
+    doTest(parseKeys("de"), "foo <caret>x$ bar\n", "foo  bar\n");
+  }
+
+  public void testDeleteBigEndAtStartOfMixedWord() {
+    doTest(parseKeys("dE"), "foo <caret>x$ bar\n", "foo  bar\n");
+  }
+
+  public void testChangeWordAtStartOfMixedWord2() {
+    doTest(parseKeys("cw"), "foo <caret>$x bar\n", "foo x bar\n");
+  }
+
+  public void testChangeBigWordAtStartOfMixedWord2() {
+    doTest(parseKeys("cW"), "foo <caret>$x bar\n", "foo  bar\n");
+  }
+
+  public void testChangeEndAtStartOfMixedWord2() {
+    doTest(parseKeys("ce"), "foo <caret>$x bar\n", "foo  bar\n");
+  }
+
+  public void testChangeBigEndAtStartOfMixedWord2() {
+    doTest(parseKeys("cE"), "foo <caret>$x bar\n", "foo  bar\n");
+  }
+
+
+  public void testDeleteWordAtStartOfMixedWord2() {
+    doTest(parseKeys("dw"), "foo <caret>$x bar\n", "foo x bar\n");
+  }
+
+  public void testDeleteBigWordAtStartOfMixedWord2() {
+    doTest(parseKeys("dW"), "foo <caret>$x bar\n", "foo bar\n");
+  }
+
+  public void testDeleteEndAtStartOfMixedWord2() {
+    doTest(parseKeys("de"), "foo <caret>$x bar\n", "foo  bar\n");
+  }
+
+  public void testDeleteBigEndAtStartOfMixedWord2() {
+    doTest(parseKeys("dE"), "foo <caret>$x bar\n", "foo  bar\n");
+  }
+
+
+
+
   // VIM-296 |cc|
   public void testChangeLineAtLastLine() {
     doTest(parseKeys("cc"),
