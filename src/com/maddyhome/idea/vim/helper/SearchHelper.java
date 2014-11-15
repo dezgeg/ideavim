@@ -49,11 +49,11 @@ public class SearchHelper {
     }
     else {
       start = EditorHelper.getLineStartForOffset(editor, offset);
-      end = offset - 1;
+      end = offset;
     }
 
     CharSequence chars = editor.getDocument().getCharsSequence();
-    for (int i = start; i <= end; i++) {
+    for (int i = start; i < end; i++) {
       if (!Character.isWhitespace(chars.charAt(i))) {
         return true;
       }
@@ -888,7 +888,7 @@ public class SearchHelper {
     if (logger.isDebugEnabled()) logger.debug("start=" + start);
 
     // Find word end
-    boolean onWordEnd = pos == max ||
+    boolean onWordEnd = pos >= max - 1 ||
                         CharacterHelper.charType(chars.charAt(pos + 1), isBig) != CharacterHelper.charType(chars.charAt(pos), isBig);
 
     if (logger.isDebugEnabled()) logger.debug("onWordEnd=" + onWordEnd);
@@ -915,7 +915,7 @@ public class SearchHelper {
       if (count > 1) {
         firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
       }
-      if (firstEnd < max) {
+      if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goBack = true;
         }
@@ -935,14 +935,14 @@ public class SearchHelper {
       if (count > 1) {
         firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
       }
-      if (firstEnd < max) {
+      if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goForward = true;
         }
       }
     }
     if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
-      if (end < max) {
+      if (end < max - 1) {
         if (CharacterHelper.charType(chars.charAt(end + 1), !isBig) != CharacterHelper.charType(chars.charAt(end), !isBig)) {
           goForward = true;
         }

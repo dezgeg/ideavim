@@ -244,6 +244,20 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("one three\n");
   }
 
+  // |d| |v_aW|
+  public void testDeleteOuterBigWordOnLineWithNoNewline() {
+    typeTextInFile(parseKeys("daW"),
+                   "foo");
+    myFixture.checkResult("");
+  }
+
+  // |d| |v_aW|
+  public void testDeleteOuterBigWordOnLineWithNoNewlineOnLastCharOfWord() {
+    typeTextInFile(parseKeys("daW"),
+                   "fo<caret>o");
+    myFixture.checkResult("");
+  }
+
   // |d| |v_is|
   public void testDeleteInnerSentence() {
     typeTextInFile(parseKeys("dis"),
