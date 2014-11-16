@@ -864,6 +864,9 @@ public class ChangeGroup {
                                                 int count,
                                                 int rawCount,
                                                 @NotNull Argument argument) {
+    if (editor.getDocument().getCharsSequence().length() == 0) {
+      return null;
+    }
     TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true);
     // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
     if (range != null) {
