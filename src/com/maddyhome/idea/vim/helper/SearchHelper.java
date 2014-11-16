@@ -102,6 +102,10 @@ public class SearchHelper {
   @Nullable
   public static TextRange findBlockRange(@NotNull Editor editor, char type, int count, boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
+    if (chars.length() == 0) {
+      return null;
+    }
+
     int pos = editor.getCaretModel().getOffset();
     int start = editor.getSelectionModel().getSelectionStart();
     int end = editor.getSelectionModel().getSelectionEnd();

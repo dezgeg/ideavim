@@ -167,6 +167,12 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("(x\n");
   }
 
+  // |v_ib|
+  public void testInnerBlockCrashWhenEmptyFile() {
+    typeTextInFile(parseKeys("di)"), "");
+    myFixture.checkResult("");
+  }
+
   // VIM-314 |d| |v_iB|
   public void testDeleteInnerCurlyBraceBlock() {
     typeTextInFile(parseKeys("di{"),
