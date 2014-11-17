@@ -202,7 +202,7 @@ public class EditorHelper {
    * @return The logical line number
    */
   public static int visualLineToLogicalLine(@NotNull final Editor editor, final int line) {
-    int logicalLine = editor.visualToLogicalPosition(new VisualPosition(line, 0)).line;
+    int logicalLine = editor.visualToLogicalPosition(new VisualPosition(Math.max(line, 0), 0)).line;
     return normalizeLine(editor, logicalLine);
   }
 

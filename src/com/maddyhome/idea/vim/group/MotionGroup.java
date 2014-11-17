@@ -1119,6 +1119,9 @@ public class MotionGroup {
 
   public int moveCaretToLineScreenEnd(@NotNull Editor editor, boolean allowEnd) {
     int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor) + EditorHelper.getScreenWidth(editor) - 1;
+    if (col < 0) {
+      return -1;
+    }
     return moveCaretToColumn(editor, col, allowEnd);
   }
 

@@ -273,7 +273,11 @@ public class ChangeGroup {
     boolean res = false;
 
     VisualPosition vp = editor.getCaretModel().getVisualPosition();
-    vp = new VisualPosition(vp.line + dir, vp.column);
+    int line = vp.line + dir;
+    if (EditorHelper.normalizeVisualLine(editor, line) != line) {
+      return false;
+    }
+    vp = new VisualPosition(line, vp.column);
     int len = EditorHelper.getLineLength(editor, EditorHelper.visualLineToLogicalLine(editor, vp.line));
     if (vp.column < len) {
       int offset = EditorHelper.visualPositionToOffset(editor, vp);
