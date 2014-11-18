@@ -129,6 +129,118 @@ public class MotionActionTest extends VimTestCase {
     assertSelection(null);
   }
 
+  // |v_iW|
+  public void testVisualMotionInnerBigWordToRight() {
+    typeTextInFile(parseKeys("vliW"),
+                   "one tw<caret>o.three four\n");
+    assertSelection("o.three");
+  }
+
+  // |v_iW|
+  public void testVisualMotionInnerTwoBigWordsToRight() {
+    typeTextInFile(parseKeys("vl2iW"),
+                   "one tw<caret>o.three four  five\n");
+    assertSelection("o.three ");
+  }
+
+  // |v_iW|
+  public void testVisualMotionInnerBigWordToRightWhenAlreadyOnAWord() {
+    typeTextInFile(parseKeys("vlliW"),
+                   "<caret>one two.three four\n");
+    assertSelection("one ");
+  }
+
+  // |v_iW|
+  public void testVisualMotionInnerTwoBigWordsToRightWhenAlreadyOnAWord() {
+    typeTextInFile(parseKeys("vll2iW"),
+                   "<caret>one two.three four\n");
+    assertSelection("one two.three");
+  }
+
+  // |v_iW|
+  public void testVisualMotionInnerBigWordToLeft() {
+    typeTextInFile(parseKeys("vhiW"),
+                   "one two.t<caret>hree four\n");
+    assertSelection("two.th");
+  }
+
+  // |v_iW|
+  public void testVisualMotionInnerTwoBigWordToLeft() {
+    typeTextInFile(parseKeys("vh2iW"),
+                   "zero  one two.t<caret>hree four\n");
+    assertSelection(" two.th");
+  }
+
+  // |v_iW|
+  public void testVisualMotionInnerBigWordToLeftWhenAlreadyOnAWord() {
+    typeTextInFile(parseKeys("vhhhiW"),
+                   "one two.three fou<caret>r\n");
+    assertSelection(" four");
+  }
+
+  // |v_iW|
+  public void testVisualMotionInnerTwoBigWordsToLeftWhenAlreadyOnAWord() {
+    typeTextInFile(parseKeys("vhhh2iW"),
+                   "<one two.three fou<caret>r\n");
+    assertSelection("two.three four");
+  }
+
+  // |v_aW|
+  public void testVisualMotionOuterBigWordToRight() {
+    typeTextInFile(parseKeys("vlaW"),
+                   "one tw<caret>o.three four\n");
+    assertSelection("o.three ");
+  }
+
+  // |v_aW|
+  public void testVisualMotionOuterTwoBigWordsToRight() {
+    typeTextInFile(parseKeys("vl2aW"),
+                   "one tw<caret>o.three four  five\n");
+    assertSelection("o.three four  ");
+  }
+
+  // |v_aW|
+  public void testVisualMotionOuterBigWordToRightWhenAlreadyOnAWord() {
+    typeTextInFile(parseKeys("vllaW"),
+                   "<caret>one two.three four\n");
+    assertSelection("one two.three");
+  }
+
+  // |v_aW|
+  public void testVisualMotionOuterTwoBigWordsToRightWhenAlreadyOnAWord() {
+    typeTextInFile(parseKeys("vll2aW"),
+                   "<caret>one two.three four five\n");
+    assertSelection("one two.three four");
+  }
+
+  // |v_aW|
+  public void testVisualMotionOuterBigWordToLeft() {
+    typeTextInFile(parseKeys("vhaW"),
+                   "one two.t<caret>hree four\n");
+    assertSelection(" two.th");
+  }
+
+  // |v_aW|
+  public void testVisualMotionOuterTwoBigWordToLeft() {
+    typeTextInFile(parseKeys("vh2aW"),
+                   "zero  one two.t<caret>hree four\n");
+    assertSelection("  one two.th");
+  }
+
+  // |v_aW|
+  public void testVisualMotionOuterBigWordToLeftWhenAlreadyOnAWord() {
+    typeTextInFile(parseKeys("vhhhaW"),
+                   "one two.three fou<caret>r\n");
+    assertSelection("two.three four");
+  }
+
+  // |v_aW|
+  public void testVisualMotionOuterTwoBigWordsToLeftWhenAlreadyOnAWord() {
+    typeTextInFile(parseKeys("vhhh2aW"),
+                   "one two.three four fiv<caret>e\n");
+    assertSelection("two.three four five");
+  }
+
   public void testEscapeInCommand() {
     typeTextInFile(parseKeys("f", "<Esc>", "<Esc>"),
                    "on<caret>e two\n" +

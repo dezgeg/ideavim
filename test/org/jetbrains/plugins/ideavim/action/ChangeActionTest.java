@@ -310,6 +310,34 @@ public class ChangeActionTest extends VimTestCase {
            "bar\n");
   }
 
+  // |d| |v_iw|
+  public void testDeleteInnerWord() {
+    doTest(parseKeys("diw"), " <caret> foo  bar\n", "foo  bar\n");
+  }
+
+  // |d| |v_iw|
+  public void testDeleteTwoInnerWords() {
+    doTest(parseKeys("d2iw"), " <caret> foo  bar\n", "  bar\n");
+  }
+
+  // |d| |v_iw|
+  public void testDeleteInnerWordWhitespaceAtStartOfLine() {
+    doTest(parseKeys("diw"), "foo   \n" + "  <caret> bar\n", "foo   \n" + "bar\n");
+  }
+
+  // |d| |v_iw|
+  public void testDeleteInnerWordAtTrailingWhitespaceBeforeTwoNewlines() {
+    doTest(parseKeys("diw"), "foo <caret>  \n" +
+                             "\n" +
+                             "\n" +
+                             "bar\n",
+                             "foo\n" +
+                             "\n" +
+                             "\n" +
+                             "bar\n");
+
+  }
+
   // VIM-394 |d| |v_aw|
   public void testDeleteIndentedWordBeforePunctuation() {
     doTest(parseKeys("daw"), "foo\n" + "  <caret>bar, baz\n", "foo\n" + "  , baz\n");
@@ -318,6 +346,41 @@ public class ChangeActionTest extends VimTestCase {
   // |d| |v_aw|
   public void testDeleteLastWordAfterPunctuation() {
     doTest(parseKeys("daw"), "foo(<caret>bar\n" + "baz\n", "foo(\n" + "baz\n");
+  }
+
+  // |d| |v_aw|
+  public void testDeleteOuterWordDeletesTrailingWhitespace() {
+    doTest(parseKeys("daw"), "foo   b<caret>ar     \n", "foo  <caret> \n");
+  }
+
+  // |d| |v_aw|
+  public void testDeleteOuterWordDeletesPrecedingWhitespaceIfNoTrailingWhitespaceAndAWordIsBefore() {
+    doTest(parseKeys("daw"), "foo   b<caret>ar\n", "fo<caret>o\n");
+  }
+
+  // |d| |v_aw|
+  public void testDeleteOuterWordDeletesNoPrecedingWhitespaceIfNoWordsBefore() {
+    doTest(parseKeys("daw"), "   b<caret>ar\n", "  <caret> \n");
+  }
+
+  // |d| |v_aw|
+  public void testDeleteOuterWordInSpaceBetweenWords() {
+    doTest(parseKeys("daw"), "x<caret> foobar    y\n", "x    y\n");
+  }
+
+  // |d| |v_aw|
+  public void testDeleteOuterWordInManySpacesBetweenWords() {
+    doTest(parseKeys("daw"), "x <caret>  foobar    y\n", "x    y\n");
+  }
+
+  // |d| |v_aw|
+  public void testDeleteOuterWordAtTrailingWhitespaceBeforeLineWithWord() {
+    doTest(parseKeys("daw"), "foo <caret>  \n" + "bar\n", "foo\n");
+  }
+
+  // |d| |v_aw|
+  public void testDeleteOuterWordAtTrailingWhitespaceBeforeEmptyLine() {
+    doTest(parseKeys("daw"), "foo <caret>  \n" + "\n" + "bar\n", "foo\nbar\n");
   }
 
   // VIM-244 |d| |l|
