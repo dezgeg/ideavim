@@ -24,6 +24,8 @@
   <property name="resources" value="${basedir}/resources"/>
   <property name="test" value="${basedir}/test"/>
   <property name="idea.home" value="${idea}/unzip"/>
+  <property name="pitest.core.path" value="${idea}/pitest.jar"/>
+  <property name="pitest.cli.path" value="${idea}/pitest-cli.jar"/>
   <property environment="env"/>
   <property name="tools.jar" value="${env.JAVA_HOME}/lib/tools.jar"/>
   <property name="version" value="${version-id}"/>
@@ -49,6 +51,12 @@
   <path id="test.classpath">
     <path refid="build.classpath"/>
     <pathelement path="${tools.jar}"/>
+  </path>
+
+  <path id="pitest.classpath">
+    <path refid="test.classpath"/>
+    <pathelement path="${pitest.core.path}"/>
+    <pathelement path="${pitest.cli.path}"/>
   </path>
 
   <!-- Clean all the generated stuff -->
@@ -179,5 +187,50 @@
         </fileset>
       </batchtest>
     </junit>
+  </target>
+
+  <!-- Download PIT -->
+  <target name="download-pitest" description="Downloads PIT binaries">
+    <mkdir dir="${idea}"/>
+    <get src="${pitest.core.download.url}" dest="${pitest.core.path}" skipexisting="true"/>
+    <get src="${pitest.cli.download.url}" dest="${pitest.cli.path}" skipexisting="true"/>
+  </target>
+
+  <!-- Run mutation tests with PIT -->
+  <target name="pitest">
+    <java
+      fork="true"
+      classpathref="pitest.classpath"
+      classname="org.pitest.mutationtest.commandline.MutationCoverageReport">
+      <arg value="--sourceDir=${src}"/>
+      <arg value="--reportDir=${test-reports}"/>
+      <arg value="--jvmArgs=-ea"/>
+      <arg value="--jvmArgs=-Djava.awt.headless=true"/>
+      <arg value="--jvmArgs=-Didea.plugins.path=${out}"/>
+      <arg value="--jvmArgs=-Didea.load.plugins.id=IdeaVIM"/>
+      <arg value="--targetClasses=com.maddyhome.idea.vim.*"/>
+      <arg value="--targetTests=org.jetbrains.plugins.ideavim.*"/>
+      <arg value="--outputFormats=HTML,XML,CSV"/>
+      <arg value="--timeoutConst=16000"/>
+      <arg value="--timestampedReports=false"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.action.motion.file.*"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.action.motion.screen.*"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.action.motion.scroll.*"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.action.motion.tabs.*"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.action.window.*"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.group.DigraphGroup"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.group.EditorGroup"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.group.HistoryGroup"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.group.WindowGroup"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.helper.MacKeyRepeat"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.regexp.*"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.ui.*"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.RegisterActions"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.VimPlugin"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.VimTypedActionHandler"/>
+      <arg value="--avoidCallsTo=com.intellij.openapi.diagnostic"/>
+      <arg value="--verbose"/>
+    </java>
   </target>
 </project>
