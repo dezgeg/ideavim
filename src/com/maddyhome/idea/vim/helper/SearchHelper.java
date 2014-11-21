@@ -854,11 +854,7 @@ public class SearchHelper {
   @NotNull
   public static TextRange findWordUnderCursor(@NotNull Editor editor, int count, int dir, boolean isOuter, boolean isBig, boolean hasSelection) {
     if (logger.isDebugEnabled()) {
-      logger.debug("count=" + count);
-      logger.debug("dir=" + dir);
-      logger.debug("isOuter=" + isOuter);
-      logger.debug("isBig=" + isBig);
-      logger.debug("hasSelection=" + hasSelection);
+      logger.debug("count=" + count + " dir=" + dir + " isOuter=" + isOuter + " isBig=" + isBig + " hasSelection=" + hasSelection);
     }
 
     CharSequence chars = editor.getDocument().getCharsSequence();
@@ -871,117 +867,99 @@ public class SearchHelper {
     }
 
     if (logger.isDebugEnabled()) {
-      logger.debug("min=" + min);
-      logger.debug("max=" + max);
+      //logger.debug("min=" + min);
+      //logger.debug("max=" + max);
     }
 
     int pos = editor.getCaretModel().getOffset();
-    boolean startSpace = CharacterHelper.charType(chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
+    CharacterHelper.CharacterType charTypeAtStart = CharacterHelper.charType(chars.charAt(pos), isBig);
+    boolean startSpace = charTypeAtStart == CharacterHelper.CharacterType.WHITESPACE;
     // Find word start
-    boolean onWordStart = pos == min ||
-                          CharacterHelper.charType(chars.charAt(pos - 1), isBig) != CharacterHelper.charType(chars.charAt(pos), isBig);
+    boolean onWordStart;
+    if (pos == min) {
+      onWordStart = true;
+    } else {
+      onWordStart = CharacterHelper.charType(chars.charAt(pos - 1), isBig) != charTypeAtStart;
+    }
     int start = pos;
 
     if (logger.isDebugEnabled()) {
       logger.debug("pos=" + pos);
-      logger.debug("onWordStart=" + onWordStart);
+      logger.debug("onWordStart=" + onWordStart + " startSpace=" + startSpace);
     }
 
-    if ((!onWordStart && !(startSpace && isOuter)) || hasSelection || (count > 1 && dir == -1)) {
+    int wordsToMoveBackward = count - (onWordStart && !hasSelection ? 1 : 0);
+    if (!(wordsToMoveBackward == 0 || (hasSelection && dir == 1))) {
       if (dir == 1) {
-        start = findNextWord(chars, pos, max, -1, isBig, !isOuter);
+        start = findNextWord(chars, pos, max, -1, isBig, true);
       }
       else {
-        start = findNextWord(chars, pos, max, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
+        start = findNextWord(chars, pos, max, -wordsToMoveBackward, isBig, !isOuter);
       }
 
       start = EditorHelper.normalizeOffset(editor, start, false);
     }
 
-    if (logger.isDebugEnabled()) logger.debug("start=" + start);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Found word start: [start..pos] = " + start + ".." + pos + " '" + chars.subSequence(start, pos + 1) +"'");
+    }
 
     // Find word end
-    boolean onWordEnd = pos >= max - 1 ||
-                        CharacterHelper.charType(chars.charAt(pos + 1), isBig) != CharacterHelper.charType(chars.charAt(pos), isBig);
+    boolean onWordEnd;
+    if (pos >= max - 1) {
+      onWordEnd = true;
+    } else if (isOuter && charTypeAtStart == CharacterHelper.CharacterType.WHITESPACE) {
+      onWordEnd = false;
+    } else {
+      onWordEnd = CharacterHelper.charType(chars.charAt(pos + 1), isBig) != charTypeAtStart;
+    }
 
-    if (logger.isDebugEnabled()) logger.debug("onWordEnd=" + onWordEnd);
+    if (logger.isDebugEnabled()) logger.debug("onWordEnd=" + onWordEnd + " startSpace=" + startSpace);
 
     int end = pos;
-    if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (startSpace && isOuter)) {
-      if (dir == 1) {
-        end = findNextWordEnd(chars, pos, max, count -
-                                               (onWordEnd && !hasSelection && (!(startSpace && isOuter) || (startSpace && !isOuter))
-                                                ? 1
-                                                : 0),
-                              isBig, !isOuter, false);
-      }
-      else {
-        end = findNextWordEnd(chars, pos, max, 1, isBig, !isOuter, false);
-      }
-    }
-
-    if (logger.isDebugEnabled()) logger.debug("end=" + end);
-
-    boolean goBack = (startSpace && !hasSelection) || (!startSpace && hasSelection && !onWordStart);
-    if (dir == 1 && isOuter) {
-      int firstEnd = end;
-      if (count > 1) {
-        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false, false);
-      }
-      if (firstEnd < max - 1) {
-        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
-          goBack = true;
-        }
-      }
-    }
-    if (dir == -1 && isOuter && startSpace) {
-      if (pos > min) {
-        if (CharacterHelper.charType(chars.charAt(pos - 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
-          goBack = true;
-        }
-      }
-    }
-
-    boolean goForward = (dir == 1 && isOuter && ((!startSpace && !onWordEnd) || (startSpace && onWordEnd && hasSelection)));
-    if (!goForward && dir == 1 && isOuter) {
-      int firstEnd = end;
-      if (count > 1) {
-        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false, false);
-      }
-      if (firstEnd < max - 1) {
-        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
-          goForward = true;
-        }
-      }
-    }
-    if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
-      if (end < max - 1) {
-        if (CharacterHelper.charType(chars.charAt(end + 1), !isBig) != CharacterHelper.charType(chars.charAt(end), !isBig)) {
-          goForward = true;
-        }
-      }
+    int wordsToMoveForward = count - (onWordEnd && !hasSelection ? 1 : 0);
+    if (!(wordsToMoveForward == 0 || dir == -1)) {
+      end = findNextWordEnd(chars, pos, max, wordsToMoveForward, isBig, !isOuter, false);
     }
 
     if (logger.isDebugEnabled()) {
-      logger.debug("goBack=" + goBack);
-      logger.debug("goForward=" + goForward);
+      logger.debug("Found word end: [start..end] = " + start + ".." + end + " '" + chars.subSequence(start, end + 1) + "'");
     }
 
-    if (goForward && anyNonWhitespace(editor, end, 1)) {
-      while (end < max && CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+    // Now check if we need to add some more whitespace to the range
+    boolean addWhitespaceToStart = !startSpace && isOuter;
+    boolean addWhitespaceToEnd = !startSpace && isOuter;
+    if (!startSpace && hasSelection && isOuter) {
+      addWhitespaceToEnd = dir == 1 && !onWordEnd;
+      addWhitespaceToStart = dir == -1 && !onWordStart;
+    }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("addWhitespaceToStart=" + addWhitespaceToStart + " addWhitespaceToEnd=" + addWhitespaceToEnd);
+    }
+
+    int lineMax = EditorHelper.getLineEndForOffset(editor, end);
+    if (addWhitespaceToEnd) {
+      while (end + 1 < lineMax && CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         end++;
+        addWhitespaceToStart = false;
       }
     }
-    if (goBack && anyNonWhitespace(editor, start, -1)) {
-      while (start > min && CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+
+    int lineMin = EditorHelper.getLineStartForOffset(editor, end);
+    if (addWhitespaceToStart && anyNonWhitespace(editor, start, -1)) {
+      while (start > lineMin && CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         start--;
       }
     }
 
     if (logger.isDebugEnabled()) {
-      logger.debug("start=" + start);
-      logger.debug("end=" + end);
+      logger.debug("Adjusted: [start..end] = " + start + ".." + end + " '" + chars.subSequence(start, end + 1) + "'");
     }
+
+    //if (logger.isDebugEnabled()) {
+    //  logger.debug("Whitespace included: [start..end] = " + start + ".." + end + " '" + chars.subSequence(start, end + 1) + "'");
+    //}
 
     return new TextRange(start, end);
   }
