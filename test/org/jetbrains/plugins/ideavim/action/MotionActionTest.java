@@ -14,6 +14,101 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
  * @author vlan
  */
 public class MotionActionTest extends VimTestCase {
+
+  // |v_w|
+  public void testWordForwardMotion() {
+    typeTextInFile(parseKeys("vw"),
+                   "f<caret>oobar baz\n");
+    assertSelection("oobar b");
+  }
+
+  // |v_w|
+  public void testWordForwardMotionOnEmptyLineFollowedByEmptyLine() {
+    typeTextInFile(parseKeys("w"), "foo\n" +
+                                   "<caret>\n" +
+                                   "\n" +
+                                   "bar\n");
+    myFixture.checkResult("foo\n" +
+                          "\n" +
+                          "<caret>\n" +
+                          "bar\n");
+  }
+
+  // |v_w|
+  public void testTwoWordsForwardMotionOnEmptyLine() {
+    typeTextInFile(parseKeys("2w"), "foo\n" +
+                                   "<caret>\n" +
+                                   "\n" +
+                                   "bar\n");
+    myFixture.checkResult("foo\n" +
+                          "\n" +
+                          "\n" +
+                          "<caret>bar\n");
+  }
+
+  // |v_e|
+  public void testWordEndForwardMotion() {
+    typeTextInFile(parseKeys("ve"),
+                   "f<caret>oobar baz\n");
+    assertSelection("oobar");
+  }
+
+  // |v_e|
+  public void testWordEndForwardMotionOnEmptyLineFollowedByEmptyLine() {
+    typeTextInFile(parseKeys("e"), "foo\n" +
+                                   "<caret>\n" +
+                                   "\n" +
+                                   "bar\n");
+    myFixture.checkResult("foo\n" +
+                          "\n" +
+                          "\n" +
+                          "ba<caret>r\n");
+  }
+
+  // |v_e|
+  public void testWordEndForwardMotionOnEmptyLineFollowedByTwoEmptyLines() {
+    typeTextInFile(parseKeys("e"), "foo\n" +
+                                   "<caret>\n" +
+                                   "\n" +
+                                   "\n" +
+                                   "bar\n");
+    myFixture.checkResult("foo\n" +
+                          "\n" +
+                          "\n" +
+                          "\n" +
+                          "ba<caret>r\n");
+  }
+
+  // |v_e|
+  public void testTwoWordEndsForwardMotionOnEmptyLineFollowedByTwoEmptyLines() {
+    typeTextInFile(parseKeys("2e"), "foo\n" +
+                                    "<caret>\n" +
+                                    "\n" +
+                                    "\n" +
+                                    "bar\n" +
+                                    "baz\n");
+    myFixture.checkResult("foo\n" +
+                          "\n" +
+                          "\n" +
+                          "\n" +
+                          "bar\n" +
+                          "ba<caret>z\n");
+  }
+
+  // |v_e|
+  public void testTwoWordEndsForwardMotionOnEmptyLine() {
+    typeTextInFile(parseKeys("2e"), "foo\n" +
+                                    "<caret>\n" +
+                                    "\n" +
+                                    "bar\n" +
+                                    "baz\n");
+    myFixture.checkResult("foo\n" +
+                          "\n" +
+                          "\n" +
+                          "bar\n" +
+                          "ba<caret>z\n");
+  }
+
   // VIM-198 |v_iw|
   public void testVisualMotionInnerWordNewLineAtEOF() {
     typeTextInFile(parseKeys("viw"),
