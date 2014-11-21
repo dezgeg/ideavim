@@ -157,7 +157,9 @@
     <mkdir dir="${out}/IdeaVim"/>
   </target>
 
-  <target name="test" depends="unzip, clean, prepare-tests">
+  <target name="test" depends="unzip, clean, prepare-tests, run-tests"/>
+
+  <target name="run-tests">
     <mkdir dir="${test-reports}"/>
     <junit fork="true" forkmode="once" logfailedtests="false" printsummary="true">
       <classpath refid="test.classpath"/>
