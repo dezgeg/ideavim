@@ -614,6 +614,9 @@ public class SearchHelper {
     if (pos < 0 || pos >= size) {
       return pos;
     }
+    if (chars.charAt(pos) == '\n') {
+      return step > 0 ? pos + 1 : pos;
+    }
 
     CharacterHelper.CharacterType type = CharacterHelper.charType(chars.charAt(pos), bigWord);
     if (type == CharacterHelper.CharacterType.WHITESPACE && step < 0 && pos > 0 && !spaceWords) {
@@ -622,8 +625,9 @@ public class SearchHelper {
 
     pos += step;
     while (pos >= 0 && pos < size && !found) {
+      boolean isNewline = chars.charAt(pos) == '\n';
       CharacterHelper.CharacterType newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
-      if (newType != type) {
+      if (newType != type || isNewline) {
         if (newType == CharacterHelper.CharacterType.WHITESPACE && step >= 0 && !spaceWords) {
           pos = skipSpace(chars, pos, step, size);
           res = pos;
@@ -841,7 +845,7 @@ public class SearchHelper {
       end = start + 1;
     }
     else {
-      end = findNextWordEnd(chars, start, stop, 1, false, false) + 1;
+      end = findNextWordEnd(chars, start, stop, 1, false, false, false) + 1;
     }
 
     return new TextRange(start, end);
@@ -909,10 +913,10 @@ public class SearchHelper {
                                                (onWordEnd && !hasSelection && (!(startSpace && isOuter) || (startSpace && !isOuter))
                                                 ? 1
                                                 : 0),
-                              isBig, !isOuter);
+                              isBig, !isOuter, false);
       }
       else {
-        end = findNextWordEnd(chars, pos, max, 1, isBig, !isOuter);
+        end = findNextWordEnd(chars, pos, max, 1, isBig, !isOuter, false);
       }
     }
 
@@ -922,7 +926,7 @@ public class SearchHelper {
     if (dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
+        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false, false);
       }
       if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
@@ -942,7 +946,7 @@ public class SearchHelper {
     if (!goForward && dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
+        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false, false);
       }
       if (firstEnd < max - 1) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
@@ -996,19 +1000,29 @@ public class SearchHelper {
     int pos = editor.getCaretModel().getOffset();
     int size = EditorHelper.getFileSize(editor);
 
-    return findNextWordEnd(chars, pos, size, count, bigWord, false);
+    return findNextWordEnd(chars, pos, size, count, bigWord, false, true);
   }
 
-  public static int findNextWordEnd(@NotNull CharSequence chars, int pos, int size, int count, boolean bigWord, boolean spaceWords) {
+  public static int findNextWordEnd(@NotNull CharSequence chars,
+                                    int pos,
+                                    int size,
+                                    int count,
+                                    boolean bigWord,
+                                    boolean spaceWords,
+                                    boolean skipOverNewlines) {
     int step = count >= 0 ? 1 : -1;
     count = Math.abs(count);
 
     int res = pos;
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count;) {
       res = findNextWordEndOne(chars, res, size, step, bigWord, spaceWords);
       if (res == pos || res == 0 || res == size - 1) {
         break;
       }
+      if (skipOverNewlines && chars.charAt(res) == '\n') {
+        continue;
+      }
+      i++;
     }
 
     return res;
@@ -1052,7 +1066,8 @@ public class SearchHelper {
     pos += step;
     while (pos >= 0 && pos < size && !found) {
       CharacterHelper.CharacterType newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
-      if (newType != type) {
+      boolean isNewline = chars.charAt(pos) == '\n';
+      if (newType != type || isNewline) {
         if (step >= 0) {
           res = pos - 1;
         }
