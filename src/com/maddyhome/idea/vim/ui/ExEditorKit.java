@@ -18,11 +18,13 @@
 
 package com.maddyhome.idea.vim.ui;
 
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
+import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -254,12 +256,15 @@ public class ExEditorKit extends DefaultEditorKit {
 
     public void actionPerformed(ActionEvent actionEvent) {
       logger.debug("complete entry");
-      KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+      final KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 
-      KeyHandler.getInstance().handleKey(
-        ExEntryPanel.getInstance().getEntry().getEditor(),
-        stroke,
-        ExEntryPanel.getInstance().getEntry().getContext());
+      final ExTextField entry = ExEntryPanel.getInstance().getEntry();
+      CommandProcessor.getInstance().executeCommand(entry.getEditor().getProject(), new Runnable() {
+        @Override
+        public void run() {
+          KeyHandler.getInstance().handleKey(entry.getEditor(), stroke, entry.getContext());
+        }
+      }, "", null, entry.getEditor().getDocument());
     }
   }
 

@@ -196,7 +196,7 @@ public class ChangeGroup {
     runEnterAction(editor, context);
   }
 
-  private void runEnterAction(Editor editor, @NotNull DataContext context) {
+  private void runEnterAction(Editor editor, @NotNull final DataContext context) {
     CommandState state = CommandState.getInstance(editor);
     if (state.getMode() != CommandState.Mode.REPEAT) {
       final ActionManager actionManager = ActionManager.getInstance();
@@ -614,19 +614,22 @@ public class ChangeGroup {
     if (logger.isDebugEnabled()) {
       logger.debug("processKey(" + key + ")");
     }
+    CommandState editorState = CommandState.getInstance(editor);
 
     if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
       final Document doc = editor.getDocument();
-      CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
-        @Override
-        public void run() {
-          ApplicationManager.getApplication().runWriteAction(new Runnable() {
-            public void run() {
+      //CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
+      //  @Override
+      //  public void run() {
+      //    ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      //      public void run() {
               KeyHandler.getInstance().getOriginalHandler().execute(editor, key.getKeyChar(), context);
-            }
-          });
-        }
-      }, "", doc, UndoConfirmationPolicy.DEFAULT, doc);
+      //      }
+      //    });
+      //  }
+      //}, "", KeyHandler.getInstance().getUndoGroupId(), UndoConfirmationPolicy.DEFAULT, doc);
+      CommandProcessor.getInstance().setCurrentCommandGroupId(KeyHandler.getInstance().getUndoGroupId());
+      //public abstract void executeCommand(@Nullable Project var1, @NotNull Runnable var2, @Nullable String var3, @Nullable Object var4, @NotNull UndoConfirmationPolicy var5, @Nullable Document var6);
 
       return true;
     }

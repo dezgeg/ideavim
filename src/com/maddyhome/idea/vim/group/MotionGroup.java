@@ -19,12 +19,17 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.undo.BasicUndoableAction;
+import com.intellij.openapi.command.undo.UndoManager;
+import com.intellij.openapi.command.undo.UnexpectedUndoException;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory;
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -1206,7 +1211,7 @@ public class MotionGroup {
     moveCaret(editor, offset, false);
   }
 
-  private static void moveCaret(@NotNull Editor editor, int offset, boolean forceKeepVisual) {
+  private static void moveCaret(@NotNull final Editor editor, final int offset, boolean forceKeepVisual) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
       final boolean keepVisual = forceKeepVisual || keepVisual(editor);
       if (editor.getCaretModel().getOffset() != offset) {
@@ -1214,9 +1219,22 @@ public class MotionGroup {
           // XXX: Hack for preventing the merge multiple carets that results in loosing the primary caret for |v_d|
           editor.getCaretModel().removeSecondaryCarets();
         }
+        final int offsetBefore = editor.getCaretModel().getOffset();
         editor.getCaretModel().moveToOffset(offset);
         EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
         scrollCaretIntoView(editor);
+
+        UndoManager.getInstance(editor.getProject()).undoableActionPerformed(new BasicUndoableAction() {
+          @Override
+          public void undo() throws UnexpectedUndoException {
+            editor.getCaretModel().moveToOffset(offsetBefore);
+          }
+
+          @Override
+          public void redo() throws UnexpectedUndoException {
+            editor.getCaretModel().moveToOffset(offset);
+          }
+        });
       }
 
       if (keepVisual) {

@@ -18,9 +18,19 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.notification.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationEx;
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
+import com.intellij.openapi.command.CommandEvent;
+import com.intellij.openapi.command.CommandListener;
+import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.impl.UndoManagerImpl;
+import com.intellij.openapi.command.undo.UndoUtil;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;

@@ -25,6 +25,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
@@ -71,6 +72,7 @@ public class KeyHandler {
    */
   private KeyHandler() {
     reset(null);
+    undoGroupId = new VimUndoGroupId(0);
   }
 
   /**
@@ -105,11 +107,17 @@ public class KeyHandler {
 
   public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context,
                         boolean allowKeyMappings) {
+    CommandProcessor.getInstance().setCurrentCommandGroupId(KeyHandler.getInstance().getUndoGroupId());
     VimPlugin.clearError();
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     final CommandState editorState = CommandState.getInstance(editor);
+    if (editorState.getMappingMode() == MappingMode.NORMAL) {
+      undoGroupId = new VimUndoGroupId(undoGroupId.getId() + 1);
+      CommandProcessor.getInstance().setCurrentCommandGroupId(undoGroupId);
+      Logger.getInstance(getClass()).debug("Full Reset!");
+    }
 
     // If this is a "regular" character keystroke, get the character
     char chKey = key.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? 0 : key.getKeyChar();
@@ -214,6 +222,7 @@ public class KeyHandler {
     else if (isRecording && shouldRecord) {
       VimPlugin.getRegister().recordKeyStroke(key);
     }
+    CommandProcessor.getInstance().setCurrentCommandGroupId(KeyHandler.getInstance().getUndoGroupId());
   }
 
   private boolean handleKeyMapping(@NotNull final Editor editor, @NotNull KeyStroke key,
@@ -261,12 +270,12 @@ public class KeyHandler {
           }
         }
       };
-      if (application.isUnitTestMode()) {
+      //if (application.isUnitTestMode()) {
         handleMappedKeys.run();
-      }
-      else {
-        application.invokeLater(handleMappedKeys);
-      }
+      //}
+      //else {
+      //  application.invokeLater(handleMappedKeys);
+      //}
       return true;
     }
     else {
@@ -301,7 +310,7 @@ public class KeyHandler {
             public void run() {
               KeyHandler.executeAction("EditorEscape", context);
             }
-          }, "", null);
+          }, "", KeyHandler.getInstance().getUndoGroupId());
         }
         VimPlugin.indicateError();
       }
@@ -633,6 +642,10 @@ public class KeyHandler {
     VimPlugin.getRegister().resetRegister();
   }
 
+  public Object getUndoGroupId() {
+    return undoGroupId;
+  }
+
   /**
    * This was used as an experiment to execute actions as a runnable.
    */
@@ -698,6 +711,25 @@ public class KeyHandler {
     BAD_COMMAND
   }
 
+  private static class VimUndoGroupId {
+    private int id;
+
+    public VimUndoGroupId(int id) {
+      this.id = id;
+    }
+
+    public int getId() {
+      return id;
+    }
+
+    @Override
+    public String toString() {
+      return "VimUndoGroupId{" +
+             "id=" + id +
+             '}';
+    }
+  }
+
   private int count;
   private List<KeyStroke> keys;
   private State state;
@@ -707,6 +739,7 @@ public class KeyHandler {
   @Nullable private DigraphSequence digraph = null;
   private char lastChar;
   private boolean lastWasBS;
+  private VimUndoGroupId undoGroupId;
 
   private static KeyHandler instance;
 }

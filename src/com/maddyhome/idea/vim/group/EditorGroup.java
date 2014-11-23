@@ -2,6 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.ColorKey;
 import com.intellij.openapi.editor.colors.EditorColors;
@@ -75,7 +76,12 @@ public class EditorGroup {
           // Turn on insert mode if editor doesn't have any file
           if (!EditorData.isFileEditor(editor) && editor.getDocument().isWritable() &&
               !CommandState.inInsertMode(editor)) {
-            KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
+            CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
+              @Override
+              public void run() {
+                KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
+              }
+            }, "", null, editor.getDocument());
           }
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
           editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
