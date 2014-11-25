@@ -454,6 +454,50 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     DocumentManager.getInstance().addDocumentListener(new MarkGroup.MarkUpdater());
     DocumentManager.getInstance().addDocumentListener(new SearchGroup.DocumentSearchListener());
 
+    CommandProcessor.getInstance().addCommandListener(new CommandListener() {
+      @Override
+      public void commandStarted(CommandEvent commandEvent) {
+        LOG.debug("commandStarted: " + commandEvent.getCommandName() + "/" + commandEvent.getCommand() + " of group: " + commandEvent.getCommandGroupId());
+      }
+
+      @Override
+      public void beforeCommandFinished(CommandEvent commandEvent) {
+        LOG.debug("beforeCommandFinished: " + commandEvent.getCommandName() + "/" + commandEvent.getCommand() + " of group: " + commandEvent.getCommandGroupId());
+      }
+
+      @Override
+      public void commandFinished(CommandEvent commandEvent) {
+        LOG.debug("commandFinished: " + commandEvent.getCommandName() + "/" + commandEvent.getCommand() + " of group: " + commandEvent.getCommandGroupId());
+      }
+
+      @Override
+      public void undoTransparentActionStarted() {
+        LOG.debug("undoTransparentActionStarted");
+      }
+
+      @Override
+      public void undoTransparentActionFinished() {
+        LOG.debug("undoTransparentActionFinished");
+      }
+    });
+    ActionManager.getInstance().addAnActionListener(new AnActionListener.Adapter() {
+      @Override
+      public void beforeActionPerformed(AnAction action, DataContext dataContext, AnActionEvent event) {
+        LOG.debug("beforeActionPerformed: " + action);
+      }
+
+      @Override
+      public void afterActionPerformed(AnAction action, DataContext dataContext, AnActionEvent event) {
+        LOG.debug("afterActionPerformed: " + action);
+      }
+
+      @Override
+      public void beforeEditorTyping(char c, DataContext dataContext) {
+        LOG.debug("beforeEditorTyping: " + c);
+      }
+    });
+
+
     eventFacade.addProjectManagerListener(new ProjectManagerAdapter() {
       @Override
       public void projectOpened(@NotNull final Project project) {
