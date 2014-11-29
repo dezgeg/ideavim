@@ -24,6 +24,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
@@ -410,7 +411,16 @@ public class ChangeGroup {
       strokes.addAll(getAdjustCaretActions(e));
 
       if (oldFragmentLength > 0) {
-        final AnAction editorDelete = ActionManager.getInstance().getAction("EditorDelete");
+        final AnAction editorDelete = new AnAction() {
+          @Override
+          public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+            Editor editor = anActionEvent.getData(PlatformDataKeys.EDITOR);
+            int index = editor.getCaretModel().getOffset();
+            if(editor.getDocument().getCharsSequence().charAt(index) != '\n') {
+              editor.getDocument().deleteString(index, index + 1);
+            }
+          }
+        };
         for (int i = 0; i < oldFragmentLength; i++) {
           strokes.add(editorDelete);
         }
