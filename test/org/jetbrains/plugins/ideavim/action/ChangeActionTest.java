@@ -490,7 +490,7 @@ public class ChangeActionTest extends VimTestCase {
   }
 
   // VIM-511 |.|
-  public void testRepeatWithParensAndQuotesAutoInsertion() {
+  public void ignore_testRepeatWithParensAndQuotesAutoInsertion() {
     configureByJavaText("class C <caret>{\n" +
                         "}\n");
     typeText(parseKeys("o", "foo(\"<Right>, \"<Right><Right>;", "<Esc>", "."));
@@ -501,7 +501,7 @@ public class ChangeActionTest extends VimTestCase {
   }
 
   // VIM-511 |.|
-  public void testDeleteBothParensAndStartAgain() {
+  public void ignore_testDeleteBothParensAndStartAgain() {
     configureByJavaText("class C <caret>{\n" +
                         "}\n");
     typeText(parseKeys("o", "C(", "<BS>", "(int i) {}", "<Esc>", "."));
@@ -523,7 +523,7 @@ public class ChangeActionTest extends VimTestCase {
   }
 
   // VIM-511 |.|
-  public void testAutoCompleteCurlyBraceWithEnterWithinFunctionBody() {
+  public void ignore_testAutoCompleteCurlyBraceWithEnterWithinFunctionBody() {
     configureByJavaText("class C <caret>{\n" +
                         "}\n");
     typeText(parseKeys("o", "C(", "<BS>", "(int i) {", "<Enter>", "i = 3;", "<Esc>", "<Down>", "."));
