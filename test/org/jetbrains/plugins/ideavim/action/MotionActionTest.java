@@ -298,10 +298,10 @@ public class MotionActionTest extends VimTestCase {
   }
 
   // VIM-771 |t| |;|
-  public void testTillCharRight() {
-    typeTextInFile(parseKeys("t:;"),
+  public void testTillCharRightTwice() {
+    typeTextInFile(parseKeys("t:", "t:"),
                    "<caret> 1:a 2:b 3:c \n");
-    myFixture.checkResult(" 1:a <caret>2:b 3:c \n");
+    myFixture.checkResult(" <caret>1:a 2:b 3:c \n");
   }
 
   // VIM-771 |t| |;|
@@ -343,6 +343,55 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("t:,3,"),
                    " 0:_ 1:a 2:b<caret> 3:c \n");
     myFixture.checkResult(" 0:<caret>_ 1:a 2:b 3:c \n");
+  }
+
+  // VIM-771 |T| |;|
+  public void testTillCharLeftTwice() {
+    typeTextInFile(parseKeys("T:", "T:"),
+                   " 1:a 2:b 3:c <caret> \n");
+    myFixture.checkResult(" 1:a 2:b 3:<caret>c  \n");
+  }
+
+  // VIM-771 |T| |;|
+  public void testTillCharLeftRepeated() {
+    typeTextInFile(parseKeys("T:;"),
+                   " 1:a 2:b 3:c <caret> \n");
+    myFixture.checkResult(" 1:a 2:<caret>b 3:c  \n");
+  }
+
+  // VIM-771 |T| |;|
+  public void testTillCharLeftRepeatedWithCount2() {
+    typeTextInFile(parseKeys("T:2;"),
+    " 1:a 2:b 3:c <caret> \n");
+    myFixture.checkResult(" 1:a 2:<caret>b 3:c  \n");
+  }
+
+  // VIM-771 |T| |;|
+  public void testTillCharLeftRepeatedWithCountHigherThan2() {
+    typeTextInFile(parseKeys("T:3;"),
+    " 1:a 2:b 3:c <caret> \n");
+    myFixture.checkResult(" 1:<caret>a 2:b 3:c  \n");
+  }
+
+  // VIM-771 |T| |,|
+  public void testTillCharLeftReverseRepeated() {
+    typeTextInFile(parseKeys("T:,"),
+    " 1:a <caret>2:b 3:c \n");
+    myFixture.checkResult(" 1:a <caret>2:b 3:c \n");
+  }
+
+  // VIM-771 |T| |,|
+  public void testTillCharLeftReverseRepeatedWithCount2() {
+    typeTextInFile(parseKeys("T:2,"),
+    " 1:a <caret>2:b 3:c \n");
+    myFixture.checkResult(" 1:a 2:b <caret>3:c \n");
+  }
+
+  // VIM-771 |T| |,|
+  public void testTillCharLeftReverseRepeatedWithCountHigherThan3() {
+    typeTextInFile(parseKeys("T:3,"),
+    " 1:a <caret>2:b 3:c 4:d \n");
+    myFixture.checkResult(" 1:a 2:b 3:c <caret>4:d \n");
   }
 
   // VIM-326 |d| |v_ib|
