@@ -3,6 +3,7 @@ package org.jetbrains.plugins.ideavim.action;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.group.MotionGroup;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
@@ -392,6 +393,46 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("T:3,"),
     " 1:a <caret>2:b 3:c 4:d \n");
     myFixture.checkResult(" 1:a 2:b 3:c <caret>4:d \n");
+  }
+
+  public void testTillCharRightRepeatedMotion() {
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_t, '.');
+    doTest(parseKeys("d;"), "b. <caret>_ .c", "b. .c");
+  }
+
+  public void testTillCharRightRepeatedReverseMotion() {
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_t, '.');
+    doTest(parseKeys("d,"), "b. <caret>_ .c", "b._ .c");
+  }
+
+  public void testTillCharLeftRepeatedMotion() {
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_T, '.');
+    doTest(parseKeys("d;"), "b. <caret>_ .c", "b._ .c");
+  }
+
+  public void testTillCharLeftRepeatedReverseMotion() {
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_T, '.');
+    doTest(parseKeys("d,"), "b. <caret>_ .c", "b. .c");
+  }
+
+  public void testForwardCharRepeatedMotion() {
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_f, '.');
+    doTest(parseKeys("d;"), "b. <caret>_ .c", "b. c");
+  }
+
+  public void testForwardCharRepeatedReverseMotion() {
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_f, '.');
+    doTest(parseKeys("d,"), "b. <caret>_ .c", "b_ .c");
+  }
+
+  public void testBackwardCharRepeatedMotion() {
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_F, '.');
+    doTest(parseKeys("d;"), "b. <caret>_ .c", "b_ .c");
+  }
+
+  public void testBackwardCharRepeatedReverseMotion() {
+    VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_F, '.');
+    doTest(parseKeys("d,"), "b. <caret>_ .c", "b. c");
   }
 
   // VIM-326 |d| |v_ib|

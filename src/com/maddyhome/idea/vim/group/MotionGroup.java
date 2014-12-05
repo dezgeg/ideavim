@@ -684,14 +684,17 @@ public class MotionGroup {
   }
 
   public int repeatLastMatchChar(@NotNull Editor editor, int count) {
+    Argument argument = CommandState.getInstance(editor).getCommand().getArgument();
     int res = -1;
     int startPos = editor.getCaretModel().getOffset();
+    boolean inclusive = false;
     switch (lastFTCmd) {
       case LAST_F:
         res = moveCaretToNextCharacterOnLine(editor, -count, lastFTChar);
         break;
       case LAST_f:
         res = moveCaretToNextCharacterOnLine(editor, count, lastFTChar);
+        inclusive = true;
         break;
       case LAST_T:
         res = moveCaretToBeforeNextCharacterOnLine(editor, -count, lastFTChar);
@@ -704,7 +707,17 @@ public class MotionGroup {
         if (res == startPos && Math.abs(count) == 1) {
           res = moveCaretToBeforeNextCharacterOnLine(editor, 2 * count, lastFTChar);
         }
+        inclusive = true;
         break;
+    }
+
+    if (count < 0) {
+      inclusive = !inclusive;
+    }
+
+    Command motion = argument == null ? null : argument.getMotion();
+    if (motion != null) {
+      motion.setFlags(motion.getFlags() | (inclusive ? Command.FLAG_MOT_INCLUSIVE : Command.FLAG_MOT_EXCLUSIVE));
     }
 
     return res;
