@@ -19,9 +19,11 @@
 package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -187,6 +189,8 @@ public class ExEntryPanel extends JPanel {
     if (!active) return;
     active = false;
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      parent.requestFocus();
+
       oldGlass.removeComponentListener(adapter);
       oldGlass.setVisible(false);
       oldGlass.remove(this);

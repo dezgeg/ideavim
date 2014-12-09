@@ -19,9 +19,8 @@
 package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.FocusWatcher;
 import com.intellij.ui.components.JBScrollPane;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorData;
@@ -54,6 +53,14 @@ public class ExOutputPanel extends JPanel {
   private boolean myAtEnd = false;
   private int myLineHeight = 0;
 
+  @NotNull private FocusWatcher myFocusWatcher = new FocusWatcher() {
+    @Override
+    protected void focusedComponentChanged(Component component, @Nullable AWTEvent cause) {
+      if (myActive && component == myEditor.getComponent()) {
+        myText.requestFocus();
+      }
+    }
+  };
   @Nullable private JComponent myOldGlass = null;
   @Nullable private LayoutManager myOldLayout = null;
   private boolean myWasOpaque = false;
@@ -113,12 +120,7 @@ public class ExOutputPanel extends JPanel {
     myText.setText(data);
     myText.setCaretPosition(0);
     if (data.length() > 0) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          activate();
-        }
-      });
+      activate();
     }
   }
 
@@ -129,6 +131,7 @@ public class ExOutputPanel extends JPanel {
     if (!myActive) return;
     myActive = false;
     myText.setText("");
+    myFocusWatcher.deinstall(myEditor.getContentComponent());
     if (myOldGlass != null) {
       myOldGlass.removeComponentListener(myAdapter);
       myOldGlass.setVisible(false);
@@ -160,17 +163,10 @@ public class ExOutputPanel extends JPanel {
     if (myOldGlass != null) {
       myOldGlass.setVisible(true);
     }
-    myActive = true;
 
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            myText.requestFocus();
-          }
-        });
-      }
-    });
+    myActive = true;
+    myText.requestFocus();
+    myFocusWatcher.install(myEditor.getContentComponent());
   }
 
   private void setFontForElements() {
@@ -278,10 +274,6 @@ public class ExOutputPanel extends JPanel {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         deactivate();
-        final VirtualFile vf = EditorData.getVirtualFile(myEditor);
-        if (vf != null) {
-          FileEditorManager.getInstance(myEditor.getProject()).openFile(vf, true);
-        }
 
         final Project project = myEditor.getProject();
 
