@@ -170,12 +170,18 @@ public class ChangeGroup {
    * @param context The data context
    */
   public void insertNewLineAbove(@NotNull final Editor editor, @NotNull final DataContext context) {
-    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineStart(editor));
-    initInsert(editor, context, CommandState.Mode.INSERT);
-    runEnterAction(editor, context);
+    if (editor.getCaretModel().getVisualPosition().line == 0) {
+      MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineStart(editor));
+      initInsert(editor, context, CommandState.Mode.INSERT);
 
-    if (!editor.isOneLineMode()) {
+      if (!editor.isOneLineMode()) {
+        runEnterAction(editor, context);
+        MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretVertical(editor, -1));
+      }
+    }
+    else {
       MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretVertical(editor, -1));
+      insertNewLineBelow(editor, context);
     }
   }
 
@@ -186,36 +192,16 @@ public class ChangeGroup {
    * @param context The data context
    */
   public void insertNewLineBelow(@NotNull final Editor editor, @NotNull final DataContext context) {
-    if (isLastLine(editor)) {
-      MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor));
-      initInsert(editor, context, CommandState.Mode.INSERT);
-      runEnterAction(editor, context);
-    }
-    else {
-      MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretVertical(editor, 1));
-      MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineStart(editor));
-      initInsert(editor, context, CommandState.Mode.INSERT);
-      runSplitAction(editor, context);
-    }
-  }
-
-  private static boolean isLastLine(@NotNull final Editor editor) {
-    return editor.getCaretModel().getLogicalPosition().line + 1 == editor.getDocument().getLineCount() - 1;
+    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor));
+    initInsert(editor, context, CommandState.Mode.INSERT);
+    runEnterAction(editor, context);
   }
 
   private void runEnterAction(Editor editor, @NotNull final DataContext context) {
-    runActionByName(editor, context, "EditorEnter");
-  }
-
-  private void runSplitAction(Editor editor, @NotNull DataContext context) {
-    runActionByName(editor, context, "EditorSplitLine");
-  }
-
-  private void runActionByName(Editor editor, DataContext context, String actionName) {
     CommandState state = CommandState.getInstance(editor);
     if (state.getMode() != CommandState.Mode.REPEAT) {
       final ActionManager actionManager = ActionManager.getInstance();
-      final AnAction action = actionManager.getAction(actionName);
+      final AnAction action = actionManager.getAction("EditorEnter");
       if (action != null) {
         strokes.add(action);
         KeyHandler.executeAction(action, context);
