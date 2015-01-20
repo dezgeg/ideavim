@@ -173,4 +173,21 @@ public abstract class VimTestCase extends UsefulTestCase {
     }, null, null);
     myFixture.checkResult(after);
   }
+
+  public void doTestJava(final List<KeyStroke> keys, String before, String after) {
+    myFixture.configureByText("Foo.java", before);
+    final Editor editor = myFixture.getEditor();
+    final KeyHandler keyHandler = KeyHandler.getInstance();
+    final EditorDataContext dataContext = new EditorDataContext(editor);
+    final Project project = myFixture.getProject();
+    RunnableHelper.runWriteCommand(project, new Runnable() {
+      @Override
+      public void run() {
+        for (KeyStroke key : keys) {
+          keyHandler.handleKey(editor, key, dataContext);
+        }
+      }
+    }, null, null);
+    myFixture.checkResult(after);
+  }
 }
