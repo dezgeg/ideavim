@@ -213,6 +213,8 @@
       <arg value="--outputFormats=HTML,XML,CSV"/>
       <arg value="--timeoutConst=16000"/>
       <arg value="--timestampedReports=false"/>
+      <arg value="--mutators=DEFAULTS,REMOVE_CONDITIONALS,INLINE_CONSTS,NON_VOID_METHOD_CALLS"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.action.file.*"/>
       <arg value="--excludedClasses=com.maddyhome.idea.vim.action.motion.file.*"/>
       <arg value="--excludedClasses=com.maddyhome.idea.vim.action.motion.screen.*"/>
       <arg value="--excludedClasses=com.maddyhome.idea.vim.action.motion.scroll.*"/>
@@ -221,7 +223,10 @@
       <arg value="--excludedClasses=com.maddyhome.idea.vim.action.VimShortcutKeyAction"/>
       <arg value="--excludedClasses=com.maddyhome.idea.vim.group.DigraphGroup"/>
       <arg value="--excludedClasses=com.maddyhome.idea.vim.group.EditorGroup"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.group.EditorGroup$LineNumbersGutterProvider"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.group.FileGroup"/>
       <arg value="--excludedClasses=com.maddyhome.idea.vim.group.HistoryGroup"/>
+      <arg value="--excludedClasses=com.maddyhome.idea.vim.group.HistoryGroup$HistoryBlock"/>
       <arg value="--excludedClasses=com.maddyhome.idea.vim.group.WindowGroup"/>
       <arg value="--excludedClasses=com.maddyhome.idea.vim.helper.MacKeyRepeat"/>
       <arg value="--excludedClasses=com.maddyhome.idea.vim.regexp.*"/>
