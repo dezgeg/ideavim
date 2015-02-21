@@ -293,6 +293,12 @@ public class MotionActionTest extends VimTestCase {
                           "Bye.\n");
   }
 
+  // |d| |v_ip|
+  public void testDeleteInnerParagraphOnEmptyFile() {
+    typeTextInFile(parseKeys("dip"), "");
+    myFixture.checkResult("");
+  }
+
   // |d| |v_ap|
   public void testDeleteOuterParagraph() {
     typeTextInFile(parseKeys("dap"),

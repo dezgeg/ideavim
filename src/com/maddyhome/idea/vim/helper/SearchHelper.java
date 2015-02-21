@@ -1686,6 +1686,9 @@ public class SearchHelper {
   public static TextRange findParagraphRange(@NotNull Editor editor, int count, boolean isOuter) {
     int line = editor.getCaretModel().getLogicalPosition().line;
     int maxline = EditorHelper.getLineCount(editor);
+    if (maxline == 0) {
+      return new TextRange(0, 0);
+    }
     if (logger.isDebugEnabled()) logger.debug("starting on line " + line);
     int sline;
     int eline;
