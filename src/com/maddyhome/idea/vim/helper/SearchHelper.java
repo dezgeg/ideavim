@@ -1567,6 +1567,9 @@ public class SearchHelper {
   public static TextRange findSentenceRange(@NotNull Editor editor, int count, boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int max = EditorHelper.getFileSize(editor);
+    if (max == 0) {
+      return new TextRange(0, 0);
+    }
     int offset = editor.getCaretModel().getOffset();
     int ssel = editor.getSelectionModel().getSelectionStart();
     int esel = editor.getSelectionModel().getSelectionEnd();
