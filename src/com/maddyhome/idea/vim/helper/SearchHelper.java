@@ -357,6 +357,9 @@ public class SearchHelper {
   @Nullable
   public static TextRange findBlockQuoteInLineRange(@NotNull Editor editor, char quote, boolean isOuter) {
     final CharSequence chars = editor.getDocument().getCharsSequence();
+    if (chars.length() == 0) {
+      return null;
+    }
     final int pos = editor.getCaretModel().getOffset();
     if (chars.charAt(pos) == '\n') {
       return null;

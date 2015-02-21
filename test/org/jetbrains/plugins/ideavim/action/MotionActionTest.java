@@ -435,6 +435,12 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo = ;\n");
   }
 
+  // |v_i`|
+  public void testQuoteMotionOnEmptyFile() {
+    typeTextInFile(parseKeys("vi`"), "");
+    myFixture.checkResult("");
+  }
+
   // |%|
   public void testPercentMatchSimple() {
     typeTextInFile(parseKeys("%"),
