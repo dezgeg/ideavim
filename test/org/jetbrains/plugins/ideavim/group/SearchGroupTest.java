@@ -108,7 +108,13 @@ public class SearchGroupTest extends VimTestCase {
                    "<caret>Hello, Österreich!\n");
     assertOffset(7);
   }
-  
+
+  // |*|
+  public void testSearchWordUnderCursorForwardOnEmptyFile() {
+    typeTextInFile(parseKeys("*"), "");
+    assertOffset(0);
+  }
+
   private void setHighlightSearch() {
     final Options options = Options.getInstance();
     options.resetAllOptions();

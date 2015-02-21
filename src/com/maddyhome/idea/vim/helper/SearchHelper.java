@@ -799,6 +799,9 @@ public class SearchHelper {
   @Nullable
   public static TextRange findWordUnderCursor(@NotNull Editor editor) {
     CharSequence chars = editor.getDocument().getCharsSequence();
+    if (chars.length() == 0) {
+      return null;
+    }
     int stop = EditorHelper.getLineEndOffset(editor, editor.getCaretModel().getLogicalPosition().line, true);
 
     int pos = editor.getCaretModel().getOffset();
