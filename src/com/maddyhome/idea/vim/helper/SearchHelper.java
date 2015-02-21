@@ -862,6 +862,9 @@ public class SearchHelper {
     //int max = EditorHelper.getLineEndOffset(editor, EditorHelper.getCurrentLogicalLine(editor), true);
     int min = 0;
     int max = EditorHelper.getFileSize(editor);
+    if (max == 0) {
+      return new TextRange(0, 0);
+    }
 
     if (logger.isDebugEnabled()) {
       logger.debug("min=" + min);

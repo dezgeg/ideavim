@@ -28,6 +28,12 @@ public class MotionActionTest extends VimTestCase {
     assertSelection("two.three");
   }
 
+  // |v_iw|
+  public void testVisualMotionInnerOnEmptyFile() {
+    typeTextInFile(parseKeys("viw"), "");
+    assertSelection(null);
+  }
+
   public void testEscapeInCommand() {
     typeTextInFile(parseKeys("f", "<Esc>", "<Esc>"),
                    "on<caret>e two\n" +
